@@ -1,1 +1,6 @@
-{"project_start_date": "Not 17 April 2023", "raw_train_data_path": "./data/raw/train", "raw_train_metadata_path": "./data/raw/train/_classes.csv", "raw_val_data_path": "./data/raw/valid", "raw_val_metadata_path": "./data/raw/valid/_classes.csv", "misclassification_cost_matrix": [[0, 4, 9], [3.5, 0, 4.5], [99.9, 499.75, 0]], "device": "cpu"}
+{"project_start_date": "Not 17 April 2023", "raw_train_data_path": "./data/raw/train",
+  "raw_train_metadata_path": "./data/raw/train/_classes.csv", "raw_val_data_path": "./data/raw/valid",
+  "raw_val_metadata_path": "./data/raw/valid/_classes.csv",
+  "misclassification_cost_matrix": [[0, 4, 9], [3.5, 0, 4.5], [99.9, 499.75, 0]],
+  "device": "cpu"
+}

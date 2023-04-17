@@ -31,9 +31,9 @@ def get_constants(names):
     return constants
 
 
-def update_constants(constants):
+def create_constants(constants):
     """
-    Function to store values of constants relevant to program execution
+    Function to create values of new constants relevant to program execution
 
     Inputs
     constants: dict like containing name and value of constant
@@ -45,7 +45,36 @@ def update_constants(constants):
         all_constants = json.load(f)
 
     for constant in constants.keys():
-        all_constants[constant] = constants[constant]
+        if constant in all_constants.keys():
+            sys.exit('Constant with this name already exists. Choose another name or use update_constant instead')
+        else:
+            all_constants[constant] = constants[constant]
+            
+
+    with open('./src/constants.json', 'w') as f:
+        json.dump(all_constants, f)
+
+    return 0
+
+
+def update_constants(constants):
+    """
+    Function to update values of existing constants relevant to program execution
+
+    Inputs
+    constants: dict like containing name and value of constant
+
+    Outputs
+    None
+    """
+    with open('./src/constants.json', 'r') as f:
+        all_constants = json.load(f)
+
+    for constant in constants.keys():
+        if constant in all_constants.keys():
+            all_constants[constant] = constants[constant]
+        else:
+            sys.exit('Constant does not exist. Use create_constant instead')
 
     with open('./src/constants.json', 'w') as f:
         json.dump(all_constants, f)
