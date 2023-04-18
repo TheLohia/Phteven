@@ -6,14 +6,15 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 
 # Define the transforms for the training data
-train_transform = transforms.Compose([
-    transforms.RandomResizedCrop(224),
-    transforms.RandomHorizontalFlip(),
-    transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
-    transforms.RandomRotation(degrees=20),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
+if __name__ == "__main__": 
+    train_transform = transforms.Compose([
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
+        transforms.RandomRotation(degrees=20),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
 
 class MeatDataset(Dataset):
     """A PyTorch Dataset class for loading images from a directory containing meat freshness images.
@@ -29,16 +30,16 @@ class MeatDataset(Dataset):
         Args:
             data_dir (str): The path to the directory containing the image files.
             transform (callable, optional): Optional transforms to be applied to the images.
-        """
-        self.data_dir = data_dir
-        self.file_names = [f for f in os.listdir(data_dir) if f.endswith(".jpg")]
-        self.transform = transform
+            """
+      self.data_dir = data_dir
+      self.file_names = [f for f in os.listdir(data_dir) if f.endswith(".jpg")]
+      self.transform = transform
 
     def __len__(self):
       """
         Returns the number of images in the dataset.
         """
-        return len(self.file_names)
+      return len(self.file_names)
 
     def __getitem__(self, idx):
        """
@@ -50,16 +51,15 @@ class MeatDataset(Dataset):
         Returns:
             tuple: A tuple containing the image and corresponding label.
         """
-        file_name = self.file_names[idx]
-        img_path = os.path.join(self.data_dir, file_name)
-        img_class = file_name.split("-")[0]
+       file_name = self.file_names[idx]
+       img_path = os.path.join(self.data_dir, file_name)
+       img_class = file_name.split("-")[0]
 
-        # Load the image
-        img = Image.open(img_path)
-
-        # Apply the transforms
-        if self.transform:
-            img = self.transform(img)
+       # Load the image
+       img = Image.open(img_path)
+       # Apply the transforms
+       if self.transform:
+        img = self.transform(img)
 
         # Convert the class label to a tensor
         label = torch.tensor([0, 0, 0], dtype=torch.float32)
