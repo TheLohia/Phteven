@@ -64,10 +64,10 @@ class MeatDataset(Dataset):
         # Convert the class label to a tensor
         label = torch.tensor([0, 0, 0], dtype=torch.float32)
         if img_class == "FRESH":
-            label = torch.tensor([1, 0, 0], dtype=torch.float32)
+            label = torch.tensor(2, dtype=torch.long)
         elif img_class == "HALF":
-            label = torch.tensor([0, 1, 0], dtype=torch.float32)
+            label = torch.tensor(1, dtype=torch.long)
         elif img_class == "SPOILED":
-            label = torch.tensor([0, 0, 1], dtype=torch.float32)
-
+            label = torch.tensor(0, dtype=torch.long)
+            
         return img, label
