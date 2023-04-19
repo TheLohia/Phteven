@@ -94,3 +94,7 @@ target/
 
 #models
 *.bin
+*.pth
+
+#others
+terminal.txt

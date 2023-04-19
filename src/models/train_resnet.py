@@ -19,12 +19,67 @@ import wandb
 from tqdm import tqdm
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# import sys
+# sys.path.append("~/bt5153/src")
+# from src.evaluation import missclassification_cost
+# from src.utils import get_constants, update_constants, delete_constants
+# from src.features.build_features import MeatDataset
 
-import sys
-sys.path.append('../dev')
-from src.evaluation import missclassification_cost
-from src.utils import get_constants, update_constants, delete_constants
-from src.features.build_features import MeatDataset
+class MeatDataset(Dataset):
+    """A PyTorch Dataset class for loading images from a directory containing meat freshness images.
+    
+    Args:
+        data_dir (str): The path to the directory containing the image files.
+        transform (callable, optional): Optional transforms to be applied to the images.
+    """
+    def __init__(self, data_dir, transform=None):
+      """
+        Initializes a new instance of the MeatDataset class.
+        
+        Args:
+            data_dir (str): The path to the directory containing the image files.
+            transform (callable, optional): Optional transforms to be applied to the images.
+            """
+      self.data_dir = data_dir
+      self.file_names = [f for f in os.listdir(data_dir) if f.endswith(".jpg")]
+      self.transform = transform
+
+    def __len__(self):
+      """
+        Returns the number of images in the dataset.
+        """
+      return len(self.file_names)
+
+    def __getitem__(self, idx):
+       """
+        Returns the image and corresponding label at the given index in the dataset.
+        
+        Args:
+            idx (int): The index of the image to retrieve.
+            
+        Returns:
+            tuple: A tuple containing the image and corresponding label.
+        """
+       file_name = self.file_names[idx]
+       img_path = os.path.join(self.data_dir, file_name)
+       img_class = file_name.split("-")[0]
+
+       # Load the image
+       img = Image.open(img_path)
+       # Apply the transforms
+       if self.transform:
+        img = self.transform(img)
+
+        # Convert the class label to a tensor
+        label = torch.tensor([0, 0, 0], dtype=torch.float32)
+        if img_class == "FRESH":
+            label = torch.tensor(2, dtype=torch.long)
+        elif img_class == "HALF":
+            label = torch.tensor(1, dtype=torch.long)
+        elif img_class == "SPOILED":
+            label = torch.tensor(0, dtype=torch.long)
+            
+        return img, label
     
 def train_model(model, dataloaders, criterion, optimizer, num_epochs=25):
     """Train the given PyTorch model using the specified data loaders, criterion, and optimizer.
@@ -203,36 +258,29 @@ if __name__ == "__main__":
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
     
-    with open("src/models/nnc_wandb_key.txt", "r") as f: # change this to your own API key
+    with open("./nnc_wandb_key.txt", "r") as f: # change this to your own API key
         wandb_key = f.read()
 
     wandb.login(key=wandb_key)
 
-    train_dir = "data/raw/train_split/train"
-    val_dir = "data/raw/train_split/val"
+    dir = sys.argv[1]
+
+    train_dir = f"{dir}/data/raw/train_split/train"
+    val_dir = f"{dir}/data/raw/train_split/val"
 
     # Will add to constants.json later the the hyperparameteres used here
     model_name = "resnet"
-    
-    # Number of classes in the dataset
-    NUM_CLASSES = 3
-
-    # Batch size for training (change depending on how much memory you have)
+    NUM_CLASSES = 3 # Number of classes in the dataset
     BATCH_SIZE = 32
-
-    # Number of epochs to train for
-    EPOCHS = 2
-
+    EPOCHS = 10
+    WEIGHTS = "ResNet18_Weights.IMAGENET1K_V1" #ResNet18 weights
+    LEARNING_RATE = 0.001
+    criterion = nn.CrossEntropyLoss()
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
     feature_extract = True
-
-    #ResNet18 weights
-    WEIGHTS ="ResNet18_Weights.IMAGENET1K_V1"
-
-    LEARNING_RATE = 0.001
-
-    criterion = nn.CrossEntropyLoss()
+    
+    
 
     meat_datasets = {"train": MeatDataset(train_dir, transform=train_transform),
                 "val": MeatDataset(val_dir, transform=test_transform)}
@@ -244,7 +292,9 @@ if __name__ == "__main__":
     
     
     # Initialize the model for this run
-    model_ft, input_size = initialize_model(model_name, NUM_CLASSES, feature_extract, weights=WEIGHTS)
+    model_ft, input_size = initialize_model(model_name, NUM_CLASSES, 
+                                            feature_extract, weights=WEIGHTS)
+    model_ft.to(device)
 
     params_to_update = model_ft.parameters()
     print("Params to learn:")
@@ -263,7 +313,7 @@ if __name__ == "__main__":
 
     wandb.init(
     project="bt5153_resnet",
-    mode="disabled",
+    mode="online",
         config={
             "epochs": EPOCHS,
             "batch_size": BATCH_SIZE,
@@ -272,61 +322,8 @@ if __name__ == "__main__":
             "loss": criterion,
             })
     
-    model_ft, hist = train_model(model_ft, meat_loaders, criterion, optimizer_ft, num_epochs=EPOCHS)
+    trained_model, hist = train_model(model_ft, meat_loaders, criterion, optimizer_ft, num_epochs=EPOCHS)
     wandb.finish()
 
-    # resnet_path = "models/resnet18.bin"
-    # torch.save(model_ft, resnet_path)
-
-    # class MeatDataset(Dataset):
-#     """
-#     Dataset class for the meat images.
-
-#     Args:
-#         data_dir (str): Path to the directory containing the image files.
-#         transform (callable, optional): Optional transform to be applied on a sample.
-
-#     Attributes:
-#         file_names (list): List of file names for the image files.
-
-#     """
-#     def __init__(self, data_dir, transform=None):
-#         self.data_dir = data_dir
-#         self.file_names = [f for f in os.listdir(data_dir) if f.endswith(".jpg")]
-#         self.transform = transform
-
-#     def __len__(self):
-#         """Returns the length of the dataset."""
-#         return len(self.file_names)
-
-#     def __getitem__(self, idx):
-#         """
-#         Returns a tuple of (image, label) for a given index.
-
-#         Args:
-#             idx (int): Index of the item to be returned.
-
-#         Returns:
-#             tuple: A tuple of (image, label).
-#         """
-#         file_name = self.file_names[idx]
-#         img_path = os.path.join(self.data_dir, file_name)
-#         img_class = file_name.split("-")[0]
-
-#         # Load the image
-#         img = Image.open(img_path)
-
-#         # Apply the transforms
-#         if self.transform:
-#             img = self.transform(img)
-
-#         # Convert the class label to a tensor
-#         #label = torch.tensor([0, 0, 0], dtype=torch.long)
-#         if img_class == "FRESH":
-#             label = torch.tensor(2, dtype=torch.long)
-#         elif img_class == "HALF":
-#             label = torch.tensor(1, dtype=torch.long)
-#         elif img_class == "SPOILED":
-#             label = torch.tensor(0, dtype=torch.long)
-
-#         return img, label
+    resnet_path = "/home/c/casanath/bt5153/models/resnet18.pth"
+    torch.save(trained_model.state_dict(), resnet_path)
