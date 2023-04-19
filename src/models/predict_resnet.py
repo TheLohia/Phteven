@@ -251,7 +251,8 @@ if __name__ == "__main__":
     WEIGHTS = "ResNet18_Weights.IMAGENET1K_V1" #ResNet18 weights
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
-    feature_extract = True
+    #feature_extract = True
+    feature_extract = False
 
     criterion = nn.CrossEntropyLoss()
 
