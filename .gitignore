@@ -93,7 +93,7 @@ target/
 /wandb
 
 #models
-models/
+models/*.csv
 *.bin
 *.pth
 

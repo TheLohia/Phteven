@@ -192,7 +192,7 @@ def initialize_model(model_name, num_classes, feature_extract, weights):
     input_size = 0
 
     if model_name == "resnet":
-        """ Resnet18
+        """ Resnet
         """
         #model_ft = models.resnet18(weights=weights)
         model_ft = models.resnet50(weights=weights)
