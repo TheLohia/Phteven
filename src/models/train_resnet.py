@@ -272,14 +272,14 @@ if __name__ == "__main__":
     model_name = "resnet"
     NUM_CLASSES = 3 # Number of classes in the dataset
     BATCH_SIZE = 32
-    EPOCHS = 10
+    EPOCHS = 5 #10 before
     WEIGHTS = "ResNet18_Weights.IMAGENET1K_V1" #ResNet18 weights
     LEARNING_RATE = 0.001
     criterion = nn.CrossEntropyLoss()
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
-    #feature_extract = True
-    feature_extract = False
+    feature_extract = True
+    #feature_extract = False
     
     meat_datasets = {"train": MeatDataset(train_dir, transform=train_transform),
                 "val": MeatDataset(val_dir, transform=test_transform)}
