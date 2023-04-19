@@ -158,7 +158,7 @@ def predict_model(model, dataloaders, criterion):
         print()
     predict_df = pd.DataFrame(predicts)
     final_accuracy = accuracy_score(predict_df['label'], predict_df['predict'])
-    precision, recall, f1_score, support = precision_recall_fscore_support(predict_df['label'], predict_df['predict'], average="micro")
+    precision, recall, f1_score, support = precision_recall_fscore_support(predict_df['label'], predict_df['predict'], average="weighted")
     test_metrics = {"test_accuracy": final_accuracy,
                     "test_precision": precision,
                     "test_recall": recall,
@@ -194,7 +194,8 @@ def initialize_model(model_name, num_classes, feature_extract, weights):
     if model_name == "resnet":
         """ Resnet18
         """
-        model_ft = models.resnet18(weights=weights)
+        #model_ft = models.resnet18(weights=weights)
+        model_ft = models.resnet50(weights=weights)
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
@@ -248,7 +249,8 @@ if __name__ == "__main__":
     model_name = "resnet"
     NUM_CLASSES = 3
     BATCH_SIZE = 32
-    WEIGHTS = "ResNet18_Weights.IMAGENET1K_V1" #ResNet18 weights
+    #WEIGHTS = "ResNet18_Weights.IMAGENET1K_V1" #ResNet18 weights
+    WEIGHTS = "ResNet50_Weights.IMAGENET1K_V2" #ResNet50 weights
     # Flag for feature extracting. When False, we finetune the whole model,
     #   when True we only update the reshaped layer params
     feature_extract = True
@@ -267,7 +269,7 @@ if __name__ == "__main__":
     
     # Initialize the model for this run
     trained_model, input_size = initialize_model(model_name, NUM_CLASSES, feature_extract, weights=WEIGHTS)
-    model_path = "/home/c/casanath/bt5153/models/resnet18.pth" #change file name here
+    model_path = "/home/c/casanath/bt5153/models/resnet50.pth" #change file name here
     trained_model.load_state_dict(torch.load(model_path, map_location=device))
     trained_model.to(device)
 
@@ -283,4 +285,5 @@ if __name__ == "__main__":
     predict_df = predict_model(trained_model, meat_loaders, criterion)
     wandb.finish()
 
-    predict_df.to_csv("/home/c/casanath/bt5153/models/resnet18_test_predict.csv")
+    #predict_df.to_csv("/home/c/casanath/bt5153/models/resnet18_test_predict.csv")
+    predict_df.to_csv("/home/c/casanath/bt5153/models/resnet50_test_predict.csv")

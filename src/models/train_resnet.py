@@ -208,9 +208,10 @@ def initialize_model(model_name, num_classes, feature_extract, weights):
     input_size = 0
 
     if model_name == "resnet":
-        """ Resnet18
+        """ Resnet
         """
-        model_ft = models.resnet18(weights=weights)
+        #model_ft = models.resnet18(weights=weights)
+        model_ft = models.resnet50(weights=weights)
         set_parameter_requires_grad(model_ft, feature_extract)
         num_ftrs = model_ft.fc.in_features
         model_ft.fc = nn.Linear(num_ftrs, num_classes)
@@ -273,7 +274,8 @@ if __name__ == "__main__":
     NUM_CLASSES = 3 # Number of classes in the dataset
     BATCH_SIZE = 32
     EPOCHS = 5 #10 before
-    WEIGHTS = "ResNet18_Weights.IMAGENET1K_V1" #ResNet18 weights
+    #WEIGHTS = "ResNet18_Weights.IMAGENET1K_V1" #ResNet18 weights
+    WEIGHTS = "ResNet50_Weights.IMAGENET1K_V2" #ResNet50 weights
     LEARNING_RATE = 0.001
     criterion = nn.CrossEntropyLoss()
     # Flag for feature extracting. When False, we finetune the whole model,
@@ -324,5 +326,6 @@ if __name__ == "__main__":
     trained_model, hist = train_model(model_ft, meat_loaders, criterion, optimizer_ft, num_epochs=EPOCHS)
     wandb.finish()
 
-    resnet_path = "/home/c/casanath/bt5153/models/resnet18.pth"
+    #resnet_path = "/home/c/casanath/bt5153/models/resnet18.pth"
+    resnet_path = "/home/c/casanath/bt5153/models/resnet50.pth"
     torch.save(trained_model.state_dict(), resnet_path)
