@@ -21,66 +21,12 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-# import sys
-# sys.path.append("~/bt5153/src")
-# from src.utils import get_constants, update_constants, delete_constants
-# from src.features.build_features import MeatDataset
+import sys
+sys.path.append("/home/c/casanath/bt5153")
+from src.evaluation import missclassification_cost
+from src.utils import get_constants, update_constants, delete_constants
+from src.features.build_features import MeatDataset
 
-class MeatDataset(Dataset):
-    """A PyTorch Dataset class for loading images from a directory containing meat freshness images.
-    
-    Args:
-        data_dir (str): The path to the directory containing the image files.
-        transform (callable, optional): Optional transforms to be applied to the images.
-    """
-    def __init__(self, data_dir, transform=None):
-      """
-        Initializes a new instance of the MeatDataset class.
-        
-        Args:
-            data_dir (str): The path to the directory containing the image files.
-            transform (callable, optional): Optional transforms to be applied to the images.
-            """
-      self.data_dir = data_dir
-      self.file_names = [f for f in os.listdir(data_dir) if f.endswith(".jpg")]
-      self.transform = transform
-
-    def __len__(self):
-      """
-        Returns the number of images in the dataset.
-        """
-      return len(self.file_names)
-
-    def __getitem__(self, idx):
-       """
-        Returns the image and corresponding label at the given index in the dataset.
-        
-        Args:
-            idx (int): The index of the image to retrieve.
-            
-        Returns:
-            tuple: A tuple containing the image and corresponding label.
-        """
-       file_name = self.file_names[idx]
-       img_path = os.path.join(self.data_dir, file_name)
-       img_class = file_name.split("-")[0]
-
-       # Load the image
-       img = Image.open(img_path)
-       # Apply the transforms
-       if self.transform:
-        img = self.transform(img)
-
-        # Convert the class label to a tensor
-        label = torch.tensor([0, 0, 0], dtype=torch.float32)
-        if img_class == "FRESH":
-            label = torch.tensor(2, dtype=torch.long)
-        elif img_class == "HALF":
-            label = torch.tensor(1, dtype=torch.long)
-        elif img_class == "SPOILED":
-            label = torch.tensor(0, dtype=torch.long)
-            
-        return img, label
     
 def predict_model(model, dataloaders, criterion):
     """Predict the labels for a given PyTorch model using the specified data loaders and loss function.
@@ -280,6 +226,7 @@ if __name__ == "__main__":
         config={
             "batch_size": BATCH_SIZE,
             "loss": criterion,
+            "feature_extract": feature_extract
             })
     
     predict_df = predict_model(trained_model, meat_loaders, criterion)
