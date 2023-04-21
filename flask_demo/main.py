@@ -120,15 +120,20 @@ def submit():
             try:
                 class_type = predict(processed_img)
                 if class_type == 0:
-                    output = "FRESH"
+                    output = "SPOILED"
                 if class_type == 1:
                     output = "HALF FRESH"
                 if class_type == 2:
-                    output = "SPOILED"
+                    output = "FRESH"
             except Exception as e:
                 error_msg='Unable to process image'
                 return render_template('error_page.html', msg=error_msg)
             return render_template('result.html', class_type=output)
+        
+# Error handlers
+@app.errorhandler(404)
+def error404(e):
+    return render_template("404.html")
 
 if __name__ == '__main__':
 
