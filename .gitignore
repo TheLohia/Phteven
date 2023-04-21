@@ -96,6 +96,7 @@ target/
 models/*.csv
 *.bin
 *.pth
+!flask_demo/models/resnet50_fe.pth
 
 #others
 terminal.txt
