@@ -104,8 +104,8 @@ def predict(img):
     img = img.to(device)
     img = img.unsqueeze(0)
     output = trained_model(img)
-    output = output.detach().cpu().numpy()[0]
-    output = np.argmax(np.absolute(output))
+    output = torch.argmax(output)
+    output = output.cpu().numpy()
     return output
 
 @app.route('/', methods=['GET','POST'])
@@ -122,7 +122,7 @@ def submit():
                 if class_type == 0:
                     output = "FRESH"
                 if class_type == 1:
-                    output = "HALF"
+                    output = "HALF FRESH"
                 if class_type == 2:
                     output = "SPOILED"
             except Exception as e:
@@ -146,4 +146,4 @@ if __name__ == '__main__':
     trained_model.load_state_dict(torch.load(model_path, map_location=device))
     trained_model.to(device)
     
-    app.run(debug=True, threaded=True, port=8080)
+    app.run(threaded=True, port=8080)
