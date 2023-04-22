@@ -153,4 +153,4 @@ if __name__ == '__main__':
     trained_model.load_state_dict(torch.load(model_path, map_location=device))
     trained_model.to(device)
     
-    app.run(threaded=True, port=8080)
+    app.run(threaded=True, port=9000)
