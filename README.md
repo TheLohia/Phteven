@@ -37,17 +37,23 @@ Project Organization
     │   │
     │   ├── data           <- Scripts to download or generate data
     │   │   └── make_dataset.py
+    │   ├── evaluation           <- Scripts for model evaluation
+    │   │   └── misclassification_cost.py
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
     │   │
     │   ├── models         <- Scripts to train models and then use trained models to make
     │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
+    │   │   └── train_resnet.py
+    │   │   └── predict_resnet.py
+    │   │   └── resnet_pipe.sh
+    │   │   └── resnet_predict.sh 
+    │   │
+    │   └── utils  <- Scripts for utilitity functions
+    │   │   └── manage_constants.py
     │   │
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
 
