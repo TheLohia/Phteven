@@ -27,7 +27,61 @@ from src.evaluation import missclassification_cost
 from src.utils import get_constants, update_constants, delete_constants
 from src.features.build_features import MeatDataset
 
+class MeatTestDataset(Dataset):
+    """A PyTorch Dataset class for loading images from a directory containing meat freshness images.
     
+    Args:
+        data_dir (str): The path to the directory containing the image files.
+        transform (callable, optional): Optional transforms to be applied to the images.
+    """
+    def __init__(self, data_dir, transform=None):
+      """
+        Initializes a new instance of the MeatDataset class.
+        
+        Args:
+            data_dir (str): The path to the directory containing the image files.
+            transform (callable, optional): Optional transforms to be applied to the images.
+            """
+      self.data_dir = data_dir
+      self.file_names = [f for f in os.listdir(data_dir) if f.endswith(".jpg")]
+      self.transform = transform
+
+    def __len__(self):
+      """
+        Returns the number of images in the dataset.
+        """
+      return len(self.file_names)
+
+    def __getitem__(self, idx):
+       """
+        Returns the image and corresponding label at the given index in the dataset.
+        
+        Args:
+            idx (int): The index of the image to retrieve.
+            
+        Returns:
+            tuple: A tuple containing the image and corresponding label.
+        """
+       file_name = self.file_names[idx]
+       img_path = os.path.join(self.data_dir, file_name)
+       img_class = file_name.split("-")[0]
+
+       # Load the image
+       img = Image.open(img_path)
+       # Apply the transforms
+       if self.transform:
+        img = self.transform(img)
+
+        # Convert the class label to a tensor
+        if img_class == "FRESH":
+            label = torch.tensor(2, dtype=torch.long)
+        elif img_class == "HALF":
+            label = torch.tensor(1, dtype=torch.long)
+        elif img_class == "SPOILED":
+            label = torch.tensor(0, dtype=torch.long)
+            
+        return img, label, file_name
+
 def predict_model(model, dataloaders, criterion):
     """Predict the labels for a given PyTorch model using the specified data loaders and loss function.
 
@@ -62,7 +116,7 @@ def predict_model(model, dataloaders, criterion):
         running_samples = 0
 
         # Iterate over data.
-        for inputs, labels in tqdm(dataloaders[phase], desc = phase):
+        for inputs, labels, file_names in tqdm(dataloaders[phase], desc = phase):
             inputs = inputs.to(device, dtype=torch.float)
             labels = labels.to(device, dtype=torch.long)
 
@@ -78,7 +132,8 @@ def predict_model(model, dataloaders, criterion):
                 for i in range(labels.size(0)):
                     predicts.append({
                         "predict": preds[i].item(),
-                        "label": labels[i].item()
+                        "label": labels[i].item(),
+                        "file_name": file_names[i]
                     })
 
             # statistics
@@ -205,7 +260,7 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss()
 
     meat_datasets = {
-                "test": MeatDataset(test_dir, transform=test_transform)
+                "test": MeatTestDataset(test_dir, transform=test_transform)
                 }
 
     meat_loaders ={
@@ -215,7 +270,7 @@ if __name__ == "__main__":
     
     # Initialize the model for this run
     trained_model, input_size = initialize_model(model_name, NUM_CLASSES, feature_extract, weights=WEIGHTS)
-    model_path = "/home/c/casanath/bt5153/models/resnet50.pth" #change file name here
+    model_path = "/home/c/casanath/bt5153/models/resnet50_fe.pth" #change file name here
     trained_model.load_state_dict(torch.load(model_path, map_location=device))
     trained_model.to(device)
 
