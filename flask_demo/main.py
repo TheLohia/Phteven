@@ -99,13 +99,15 @@ def process_img(img):
     return test_transform(img)
 
 def predict(img):
-    img = torch.Tensor(img)
-    img = nhwc_to_nchw(img)
-    img = img.to(device)
-    img = img.unsqueeze(0)
-    output = trained_model(img)
-    output = torch.argmax(output)
-    output = output.cpu().numpy()
+    trained_model.eval()
+    with torch.no_grad():
+        img = nhwc_to_nchw(torch.Tensor(img))
+        img = img.to(device)
+        img = img.unsqueeze(0)
+        output = trained_model(img)
+        output = torch.softmax(output, dim=1)
+        output = torch.argmax(output)
+        output = output.cpu().numpy()
     return output
 
 @app.route('/', methods=['GET','POST'])
