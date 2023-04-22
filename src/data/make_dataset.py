@@ -4,27 +4,72 @@ import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 
+import os
+import random
+import shutil
 
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
+
+def make_dataset(data_dir, train_dir, val_dir, train_percent=0.8):
     """
-    logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+    Splits a dataset of images into training and validation sets, balancing the classes between them.
+    Args:
+        data_dir: str, path to the directory containing the original dataset
+        train_dir: str, path to the directory where the training set will be saved
+        val_dir: str, path to the directory where the validation set will be saved
+        train_percent: float, percentage of images to be used for training (default is 0.8)
+    """
+    # Create the train and validation directories if they don't exist
+    if not os.path.exists(train_dir):
+        os.makedirs(train_dir)
+    if not os.path.exists(val_dir):
+        os.makedirs(val_dir)
 
+    # Get a list of all the image files in the data directory
+    image_files = [f for f in os.listdir(data_dir) if f.endswith(".jpg")]
 
-if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
+    # Shuffle the image files randomly
+    random.shuffle(image_files)
 
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
+    # Count the number of images in each class
+    class_counts = {}
+    for image_file in image_files:
+        class_name = image_file.split("-")[0]
+        if class_name not in class_counts:
+            class_counts[class_name] = 0
+        class_counts[class_name] += 1
 
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
+    # Calculate the number of images to use for training and validation for each class
+    train_counts = {}
+    val_counts = {}
+    for class_name, count in class_counts.items():
+        train_counts[class_name] = int(count * train_percent)
+        val_counts[class_name] = count - train_counts[class_name]
 
-    main()
+    # Copy the images to the train and validation directories while balancing the classes
+    for class_name, count in class_counts.items():
+        train_count = train_counts[class_name]
+        val_count = val_counts[class_name]
+
+        # Get a list of image files for this class
+        class_files = [f for f in image_files if f.startswith(class_name)]
+
+        # Split the image files into training and validation sets
+        train_files = class_files[:train_count]
+        val_files = class_files[train_count:train_count+val_count]
+
+        # Copy the training files to the train directory
+        for train_file in train_files:
+            src_path = os.path.join(data_dir, train_file)
+            dst_path = os.path.join(train_dir, train_file)
+            shutil.copy(src_path, dst_path)
+
+        # Copy the validation files to the validation directory
+        for val_file in val_files:
+            src_path = os.path.join(data_dir, val_file)
+            dst_path = os.path.join(val_dir, val_file)
+            shutil.copy(src_path, dst_path)
+
+    print("Training set:", train_counts)
+    print("Validation set:", val_counts)
+
+    return 0

@@ -75,8 +75,8 @@ target/
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
-# exclude data from source control by default
-/data/
+## exclude data from source control by default
+#/data/
 
 # Mac OS-specific storage files
 .DS_Store
@@ -87,3 +87,16 @@ target/
 
 # Mypy cache
 .mypy_cache/
+
+#wandb stuff
+/src/models/nnc_wandb_key.txt
+/wandb
+
+#models
+models/*.csv
+*.bin
+*.pth
+!flask_demo/models/resnet50_fe.pth
+
+#others
+terminal.txt
