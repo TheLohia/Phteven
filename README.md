@@ -74,10 +74,10 @@ Project Organization
 
 ### Created by: 
 **Team 09**
-Sagiraju Bhargav: A0262798J
-Nathaniel Nartea Casanova: A0262708B
-Manan Lohia:A0262838U
-Lam Ivan Chuen Chun:A0262765W
+Sagiraju Bhargav: A0262798J |
+Nathaniel Nartea Casanova: A0262708B |
+Manan Lohia:A0262838U |
+Lam Ivan Chuen Chun:A0262765W |
 Toshinori Yoshiyasu:A0262738W
 
 All Rights Reserved.
