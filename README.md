@@ -17,11 +17,23 @@ Project Organization
     │
     ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
     │
+    ├── flask_demo         <- A web demo for this project created using flask
+    │   ├── models         <- Contains resnet 50-fe model binary
+    │   ├── screenshots    <- Screenshots of demo web pages
+    │   ├── static         <- css and static resources
+    │   └── Procfile       <- Process file to run flask server
+    │   └── README.md      <- Description of flask demo
+    │   └── app.yaml       <- Config file for environment setup
+    │   └── main.py        <- Main flask file for demo
+    │   └── requirements.txt     <- Package installation
+    │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
+    ├── notebooks          <- Jupyter notebooks used for modelling, predictions and experiments
+    │   └── 1.0-EDA-and-preprocessing.ipynb
+    │   └── 2.0-image-segmentation.ipynb
+    │   └── 3.0-resnet_model_evaluation.ipynb
+    │   └── 4.0-resnet-LIME-Explanation.ipynb
     │
     ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
     │
