@@ -72,4 +72,14 @@ Project Organization
 
 --------
 
+### Created by: 
+**Team 09**
+Sagiraju Bhargav: A0262798J
+Nathaniel Nartea Casanova: A0262708B
+Manan Lohia:A0262838U
+Lam Ivan Chuen Chun:A0262765W
+Toshinori Yoshiyasu:A0262738W
+
+All Rights Reserved.
+
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
